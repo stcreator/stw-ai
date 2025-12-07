@@ -8,7 +8,7 @@ async function callHuggingFace(modelName, prompt) {
   }
 
   const res = await fetch(
-    `https://api-inference.huggingface.co/models/${modelName}`,
+    `https://router.huggingface.co/v1/inference/${model.modelName}`,
     {
       method: "POST",
       headers: {
