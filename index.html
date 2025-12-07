@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi AI STW</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+      color: #e5e7eb;
+      padding: 16px;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: conic-gradient(from 180deg, #22c55e, #06b6d4, #6366f1, #f97316, #22c55e);
+      padding: 2px;
+    }
+
+    .brand-logo-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #a5b4fc;
+    }
+
+    .brand-text-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .brand-text-sub {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: #9ca3af;
+      backdrop-filter: blur(10px);
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      border-radius: 18px;
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 60%),
+                  rgba(15, 23, 42, 0.95);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.7);
+      padding: 16px;
+      backdrop-filter: blur(12px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    /* Prompt area */
+
+    .prompt-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .prompt-input-wrap {
+      border-radius: 16px;
+      border: 1px solid #334155;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    textarea#prompt {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #e5e7eb;
+      font-size: 14px;
+      resize: none;
+      max-height: 150px;
+      min-height: 60px;
+    }
+
+    textarea#prompt::placeholder {
+      color: #6b7280;
+    }
+
+    #sendBtn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(135deg, #22c55e, #4ade80);
+      color: #020617;
+      font-size: 13px;
+      align-self: flex-end;
+      white-space: nowrap;
+    }
+
+    #sendBtn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .prompt-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .examples-title {
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #d1d5db;
+    }
+
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .example-chip {
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      color: #e5e7eb;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.05s;
+    }
+
+    .example-chip:hover {
+      background: rgba(31, 41, 55, 1);
+      border-color: #6366f1;
+      transform: translateY(-1px);
+    }
+
+    .example-chip:active {
+      transform: translateY(0);
+    }
+
+    /* Model columns */
+
+    .columns-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .columns-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .columns-header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      color: #9ca3af;
+    }
+
+    #currentPromptText {
+      color: #e5e7eb;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .panel {
+      border-radius: 14px;
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      background: radial-gradient(circle at top left, rgba(96, 165, 250, 0.15), transparent 65%),
+                  rgba(15, 23, 42, 0.96);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 160px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #bfdbfe;
+    }
+
+    .panel-provider {
+      font-size: 10px;
+      color: #9ca3af;
+    }
+
+    .panel-body {
+      font-size: 13px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      flex: 1;
+      color: #e5e7eb;
+    }
+
+    .panel-footer {
+      margin-top: 6px;
+      font-size: 10px;
+      color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      margin-right: 4px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 2px solid rgba(148, 163, 184, 0.4);
+      border-top-color: #38bdf8;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .footer span {
+      color: #a5b4fc;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-logo">
+          <div class="brand-logo-inner">AI</div>
+        </div>
+        <div>
+          <div class="brand-text-title">Multi AI Fiesta</div>
+          <div class="brand-text-sub">Compare multiple AI models side by side</div>
+        </div>
+      </div>
+      <div class="pill">Built by Anubhav • Netlify + HuggingFace</div>
+    </header>
+
+    <main class="layout">
+      <!-- LEFT: Prompt / controls -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Ask anything</div>
+            <div class="card-subtitle">Your message will be sent to all models.</div>
+          </div>
+        </div>
+
+        <div class="prompt-area">
+          <div class="prompt-input-wrap">
+            <textarea
+              id="prompt"
+              rows="3"
+              placeholder="e.g. Explain quantum physics like I'm 10 years old"
+            ></textarea>
+            <button id="sendBtn">Run ⏎</button>
+          </div>
+
+          <div class="prompt-meta">
+            <div>Press <strong>Ctrl + Enter</strong> to send</div>
+            <div id="charCount">0 characters</div>
+          </div>
+
+          <div>
+            <div class="examples-title">Try an example:</div>
+            <div class="examples" id="examples">
+              <button class="example-chip">
+                Write a short motivational quote for students.
+              </button>
+              <button class="example-chip">
+                Compare React vs Next.js for a beginner.
+              </button>
+              <button class="example-chip">
+                Explain binary search with a simple example.
+              </button>
+              <button class="example-chip">
+                Suggest YouTube video ideas for class 10 maths.
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Model responses -->
+      <section class="card">
+        <div class="columns-card">
+          <div class="columns-header">
+            <div class="columns-header-left">
+              <span class="badge" id="modelsCount">0 models</span>
+              <span>Last prompt:&nbsp;<span id="currentPromptText">None yet</span></span>
+            </div>
+            <span class="badge">HuggingFace • Free tier</span>
+          </div>
+
+          <div id="columns" class="columns"></div>
+        </div>
+      </section>
+    </main>
+
+    <div class="footer">
+      Powered by open models on HuggingFace. Crafted by <span>Anubhav</span> 🚀
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
